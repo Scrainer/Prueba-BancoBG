@@ -5,12 +5,19 @@ import { Link } from 'react-router-dom';
 const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [favorites, setFavorites] = useState([]);
+  const [precioPromedio, setPrecioPromedio] = useState([])
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get('http://localhost:3000/api/productos');
         setProducts(response.data);
+
+        const precioTotal = products.reduce((acc,producto) => acc + producto.precio,0);
+        const promedio = precioTotal/products.length; //Deberia ser 302
+
+        setPrecioPromedio(promedio)
+
       } catch (error) {
         alert('Error al obtener la lista de productos');
         console.error('Error fetching products:', error);
@@ -47,7 +54,7 @@ const ProductList = () => {
       <h2>Lista de Productos</h2>
       <ul>
         {products.map((product) => (
-          <li key={product._id}>
+          <li key={product._id} style={{textTransform: product.precio > precioPromedio ? 'uppercase' : 'none'}}>
             {product.nombre} - ${product.precio}
             <button
               onClick={() => handleAddToFavorites(product._id)}
